@@ -1,0 +1,1 @@
+10 REM ADZ Chess v2025.11
