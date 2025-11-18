@@ -1,1 +1,1 @@
-factor.bas
+bas/factor.bas
