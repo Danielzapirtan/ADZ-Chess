@@ -541,7 +541,9 @@ private:
 
 int main() {
     BasicInterpreter interpreter;
-    interpreter.runInteractive();
-    
+//    interpreter.runInteractive();
+    interpreter.loadProgramFromFile("start.bas");
+    interpreter.listProgram();
+    interpreter.run();
     return 0;
 }
