@@ -7,6 +7,7 @@
 #include <cctype>
 #include <algorithm>
 #include <fstream>
+#include <cmath>
 
 class BasicInterpreter {
 private:
@@ -140,6 +141,19 @@ public:
     }
 
 private:
+    // Check if a number is prime
+    bool isPrime(int n) {
+        if (n <= 1) return false;
+        if (n <= 3) return true;
+        if (n % 2 == 0 || n % 3 == 0) return false;
+        
+        for (int i = 5; i * i <= n; i += 6) {
+            if (n % i == 0 || n % (i + 2) == 0)
+                return false;
+        }
+        return true;
+    }
+
     std::vector<Token> tokenize(const std::string& line) {
         std::vector<Token> tokens;
         bool firstToken = true;
@@ -159,6 +173,10 @@ private:
                 i--;
                 tokens.push_back({TokenType::NUMBER, num, 0});
                 firstToken = false;
+            }
+            else if (c == '#') {
+                // Prime check operator
+                tokens.push_back({TokenType::OPERATOR, "#", 0});
             }
             else if (std::isalpha(c)) {
                 std::string ident;
@@ -259,11 +277,25 @@ private:
     int evaluateExpression(const std::vector<Token>& tokens, size_t startIndex, size_t endIndex) {
         if (startIndex >= endIndex || startIndex >= tokens.size()) return 0;
         
-        // Handle array access in expressions
+        // Handle array access and prime check in expressions
         std::vector<Token> processed;
         
         for (size_t i = startIndex; i < endIndex && i < tokens.size(); ++i) {
-            if (tokens[i].type == TokenType::IDENTIFIER && 
+            if (tokens[i].value == "#" && i + 1 < endIndex) {
+                // Prime check: #variable or #expression
+                size_t exprEnd = i + 1;
+                
+                // If next token is an identifier or number, just take that
+                if (tokens[i + 1].type == TokenType::IDENTIFIER || 
+                    tokens[i + 1].type == TokenType::NUMBER) {
+                    
+                    int value = getTokenValue(tokens[i + 1]);
+                    int result = isPrime(value) ? 1 : 0;
+                    processed.push_back({TokenType::NUMBER, std::to_string(result), 0});
+                    i++; // Skip the next token as we've processed it
+                }
+            }
+            else if (tokens[i].type == TokenType::IDENTIFIER && 
                 i + 1 < endIndex && tokens[i + 1].value == "[") {
                 // This is an array access
                 std::string arrayName = tokens[i].value;
@@ -457,36 +489,55 @@ private:
         
         if (thenIndex >= tokens.size()) return;
         
-        // Evaluate condition (simplified - looks for single operator)
-        int left = 0;
-        std::string op;
-        int right = 0;
-        
-        // Find the comparison operator
-        size_t opIndex = startIndex;
-        while (opIndex < thenIndex) {
-            if (tokens[opIndex].value == "=" || tokens[opIndex].value == "<" || 
-                tokens[opIndex].value == ">" || tokens[opIndex].value == "<=" ||
-                tokens[opIndex].value == ">=" || tokens[opIndex].value == "<>") {
-                op = tokens[opIndex].value;
+        // Check for # operator (prime check) in condition
+        bool hasPrimeCheck = false;
+        size_t primeCheckIndex = 0;
+        for (size_t i = startIndex; i < thenIndex; ++i) {
+            if (tokens[i].value == "#") {
+                hasPrimeCheck = true;
+                primeCheckIndex = i;
                 break;
             }
-            opIndex++;
         }
-        
-        if (opIndex >= thenIndex) return;
-        
-        left = evaluateExpression(tokens, startIndex, opIndex);
-        right = evaluateExpression(tokens, opIndex + 1, thenIndex);
         
         bool condition = false;
         
-        if (op == "=") condition = (left == right);
-        else if (op == "<") condition = (left < right);
-        else if (op == ">") condition = (left > right);
-        else if (op == "<=") condition = (left <= right);
-        else if (op == ">=") condition = (left >= right);
-        else if (op == "<>") condition = (left != right);
+        if (hasPrimeCheck) {
+            // Evaluate: IF #variable THEN
+            if (primeCheckIndex + 1 < thenIndex) {
+                int value = getTokenValue(tokens[primeCheckIndex + 1]);
+                condition = isPrime(value);
+            }
+        } else {
+            // Regular comparison condition
+            int left = 0;
+            std::string op;
+            int right = 0;
+            
+            // Find the comparison operator
+            size_t opIndex = startIndex;
+            while (opIndex < thenIndex) {
+                if (tokens[opIndex].value == "=" || tokens[opIndex].value == "<" || 
+                    tokens[opIndex].value == ">" || tokens[opIndex].value == "<=" ||
+                    tokens[opIndex].value == ">=" || tokens[opIndex].value == "<>") {
+                    op = tokens[opIndex].value;
+                    break;
+                }
+                opIndex++;
+            }
+            
+            if (opIndex >= thenIndex) return;
+            
+            left = evaluateExpression(tokens, startIndex, opIndex);
+            right = evaluateExpression(tokens, opIndex + 1, thenIndex);
+            
+            if (op == "=") condition = (left == right);
+            else if (op == "<") condition = (left < right);
+            else if (op == ">") condition = (left > right);
+            else if (op == "<=") condition = (left <= right);
+            else if (op == ">=") condition = (left >= right);
+            else if (op == "<>") condition = (left != right);
+        }
         
         if (condition && thenIndex + 1 < tokens.size()) {
             if (tokens[thenIndex + 1].type == TokenType::NUMBER) {
