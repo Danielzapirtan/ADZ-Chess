@@ -1,11 +1,11 @@
 10 rem Goldbach
 20 let ki=1024
 30 let mi=ki*ki
-32 let n=4*mi
-33 let nmax=16*mi
+32 let n=16*mi
+33 let nmax=32*mi
 40 if n>nmax then 80
 50 goto 1000
-60 let s=256*ki
+60 let s=512*ki
 61 if n>n/s*s then 65
 62 print "ok ";n/1024;"k"
 65 let n=n+2
