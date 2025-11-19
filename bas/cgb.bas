@@ -1,9 +1,9 @@
 10 rem Goldbach
 20 let ki=1024
 30 let mi=ki*ki
-31 let sl=32*mi
-32 let n=7*sl
-33 let nmax=8*sl
+31 let sl=64*mi
+32 let n=4*sl
+33 let nmax=5*sl
 40 if n>nmax then 80
 50 goto 1000
 60 let s=mi
