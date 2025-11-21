@@ -371,58 +371,10 @@ private:
         return 0;
     }
 
-void executePrint(const std::vector<Token>& tokens, size_t startIndex) {
-    std::string output;
-    size_t i = startIndex;
-    bool hasSemicolon = false;
-    
-    while (i < tokens.size()) {
-        if (tokens[i].type == TokenType::STRING) {
-            output += tokens[i].value;
-            i++;
-        }
-        else if (tokens[i].value == ";") {
-            hasSemicolon = true;
-            i++;
-            continue;
-        }
-        else {
-            // Find the end of the expression (until semicolon or end)
-            size_t exprEnd = i;
-            int parenDepth = 0;
-            int bracketDepth = 0;
-            
-            while (exprEnd < tokens.size()) {
-                if (tokens[exprEnd].value == "(") parenDepth++;
-                else if (tokens[exprEnd].value == ")") parenDepth--;
-                else if (tokens[exprEnd].value == "[") bracketDepth++;
-                else if (tokens[exprEnd].value == "]") bracketDepth--;
-                else if (tokens[exprEnd].value == ";" && parenDepth == 0 && bracketDepth == 0) break;
-                
-                exprEnd++;
-            }
-            
-            // Evaluate the expression
-            int result = evaluateExpression(tokens, i, exprEnd);
-            output += std::to_string(result);
-            
-            i = exprEnd;
-        }
-    }
-    
-    // Check if the last token was a semicolon
-    if (!tokens.empty() && tokens.back().value == ";") {
-        hasSemicolon = true;
-    }
-    
-    std::cout << output;
-    if (!hasSemicolon) {
-        std::cout << std::endl;
-    }
-}
     void executePrint(const std::vector<Token>& tokens, size_t startIndex) {
         std::string output;
         size_t i = startIndex;
+        bool hasSemicolon = false;
         
         while (i < tokens.size()) {
             if (tokens[i].type == TokenType::STRING) {
@@ -430,6 +382,7 @@ void executePrint(const std::vector<Token>& tokens, size_t startIndex) {
                 i++;
             }
             else if (tokens[i].value == ";") {
+                hasSemicolon = true;
                 i++;
                 continue;
             }
@@ -457,7 +410,15 @@ void executePrint(const std::vector<Token>& tokens, size_t startIndex) {
             }
         }
         
-        std::cout << output << std::endl;
+        // Check if the last token was a semicolon
+        if (!tokens.empty() && tokens.back().value == ";") {
+            hasSemicolon = true;
+        }
+        
+        std::cout << output;
+        if (!hasSemicolon) {
+            std::cout << std::endl;
+        }
     }
 
     void executeLet(const std::vector<Token>& tokens, size_t startIndex) {
