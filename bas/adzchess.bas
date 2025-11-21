@@ -109,6 +109,7 @@
 830 LET T=0
 840 GOTO 380
 1000 REM Computer finds move
+1005 PRINT "Let me think ..."
 1010 LET MC=0
 1020 LET I=0
 1030 LET P=B[I]
