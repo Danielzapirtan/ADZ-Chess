@@ -150,15 +150,15 @@ L430:
 L440:
     /* Transpose if black to move */
 L450:
-    if (STM == 0) goto L630;
+    if (STM == 0) goto L650;
 L460:
     Y = 0;
 L470:
-    if (Y > 3) goto L570;
+    if (Y > 3) goto L590;
 L480:
     X = 0;
 L490:
-    if (X > 7) goto L550;
+    if (X > 7) goto L570;
 L500:
     I1 = Y * 8 + X;
 L510:
@@ -180,7 +180,7 @@ L580:
 L590:
     I = 0;
 L600:
-    if (I > 63) goto L630;
+    if (I > 63) goto L650;
 L610:
     B[I] = 0 - B[I];
 L620:
@@ -214,13 +214,19 @@ L740:
 L750:
     Y = 7;
 L760:
-    if (Y < 0) goto L850;
+    if (Y < 0) goto L870;
 L770:
     X = 0;
 L780:
-    if (X > 7) goto L830;
+    if (X > 7) goto L840;
 L790:
     P = B[Y * 8 + X];
+L792:
+    if (P == 0) goto L800;
+L795:
+    printf("%s", "move piece ");
+    printf("%d", P);
+    printf("\n");
 L800:
     if (P > 0) goto L10000;
 L810:

@@ -42,11 +42,11 @@
 420 PRINT "Board loaded"
 430 REM
 440 REM Transpose if black to move
-450 IF STM = 0 THEN 630
+450 IF STM = 0 THEN 650
 460 LET Y = 0
-470 IF Y > 3 THEN 570
+470 IF Y > 3 THEN 590
 480 LET X = 0
-490 IF X > 7 THEN 550
+490 IF X > 7 THEN 570
 500 LET I1 = Y * 8 + X
 510 LET I2 = (7 - Y) * 8 + X
 520 LET T = B[I1]
@@ -57,7 +57,7 @@
 570 LET Y = Y + 1
 580 GOTO 470
 590 LET I = 0
-600 IF I > 63 THEN 630
+600 IF I > 63 THEN 650
 610 LET B[I] = 0 - B[I]
 620 LET I = I + 1
 630 GOTO 600
@@ -73,10 +73,12 @@
 730 REM Root search - generate and evaluate moves
 740 LET MCNT = 0
 750 LET Y = 7
-760 IF Y < 0 THEN 850
+760 IF Y < 0 THEN 870
 770 LET X = 0
-780 IF X > 7 THEN 830
+780 IF X > 7 THEN 840
 790 LET P = B[Y * 8 + X]
+792 IF P = 0 THEN 800
+795 PRINT "move piece "; P
 800 IF P > 0 THEN 10000
 810 REM Continue after move gen
 820 LET X = X + 1
